@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">		
+<head>
+	<meta charset="UTF-8">
+	<title>Виселица</title>
+    <link type="text/css" rel="stylesheet" href="css/hh.css" media="screen">
+	<script src="scripts/theme.js" type="text/javascript"></script>
+</head>
+<body>
+	<div class="container">
+		<div class="orange"><h1>Виселица</h1></div>
+		<div class="purple"></div>
+			<div class="blue"><h1>Информация о ходе игры</h1><p id="game-info"></p></div>
+			<div class="purple second-purple"></div>
+			<div class="pink">
+				<div class="theme-switcher">
+					<div class="theme-switch">
+						<label>
+							<input type="checkbox" id="theme-toggle">
+							<span>Темная тема</span>
+						</label>
+					</div>
+				</div>
+				<div id="word-display" class="word-display"></div>
+				<div class="input-container">
+					<input type="text" id="letter-input" maxlength="1" placeholder="Введите букву">
+					<p id="error-message" style="color: red; display: none;">Пожалуйста, введите одну русскую букву!</p>
+					<button id="submit-letter" disabled>Отправить букву</button>
+				</div>
+			</div>
+	</div>
+</body>
+</html>

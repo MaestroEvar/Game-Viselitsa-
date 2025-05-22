@@ -1,0 +1,205 @@
+body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+   background-image: url('../images/kosmos.jpg'); /* Путь к изображению */
+    background-size: cover; /* Растягивает на весь экран */
+    background-attachment: fixed; /* Фон фиксированный при скролле */
+    background-blend-mode: overlay; /* Смешивание с цветом фона */
+}
+.container {
+    display: grid;
+    grid-gap: 1rem;
+    width: 100%;
+    min-height: 100vh;
+}
+/*@media (min-width: 1200px){*/
+.container {
+    grid-template-columns: 10fr 30fr 30fr 10fr;
+    grid-template-rows: 10% auto 40%;
+    grid-template-areas:
+    "orange orange orange orange"
+    "purple blue blue purple2"
+    "pink pink pink pink";
+}
+
+.purple {
+    background-color: var(--purple-color);
+    grid-area: purple;
+    padding: 10px;
+    font-size: 20px;
+    text-align: center;
+}
+
+.purple.second-purple {
+    grid-area: purple2;
+}
+/*@media (min-width: 960px) and (max-width: 1199.99px) {
+    .container {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 10% 80% 80% 10%;
+        grid-template-areas:
+        "orange orange"
+        "blue purple"
+        "green yellow"
+        "pink pink";
+}
+}
+ @media(max-width: 960px) {
+    .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 10% 80% 80% 80% 80% 10%;
+        grid-template-areas:
+        "orange"
+        "blue"
+        "purple"
+        "green"
+        "yellow"
+        "pink";
+}
+}*/
+:root {
+    --text-color: black;
+    --heading-color: #ff1900;
+    --link-color: #120af9;
+    --orange-color: orange;
+    --blue-color: white;
+    --purple-color: purple;
+    --green-color: yellowgreen;
+    --yellow-color: yellow;
+    --pink-color: lightpink;
+    --button-color: blue;
+}
+
+[data-theme="dark"] {
+     --bg-color: rgba(18, 18, 18, 0.8);
+    --text-color: white;
+    --heading-color: #00fff7;
+    --link-color: #001eff;
+    --orange-color: #d18a00;
+    --blue-color: #00008b;
+    --purple-color: #6a3db8;
+    --green-color: #556b2f;
+    --yellow-color: #cca700;
+    --pink-color: #d48a94;
+    --button-color: #00008b;
+}
+.orange {
+    background-color: var(--orange-color);
+    grid-area: orange;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.blue {
+    background-color: var(--blue-color);
+    grid-area: blue;
+}
+
+.pink {
+    background-color: var(--pink-color);
+    grid-area: pink;
+}
+
+.yellow {
+    background-color: var(--yellow-color);
+    grid-area: yellow;
+}
+
+.green {
+    background-color: var(--green-color);
+    grid-area: green;
+}
+h1 {
+    text-align: center;
+    font-size: 40px;
+    color: var(--heading-color);
+}
+p {
+    text-align: center;
+    font-size: 35px;
+    color: var(--text-color);
+}
+a {
+    color: var(--link-color);
+}
+.blue, .purple, .green, .yellow {
+    min-height: 100px;
+    overflow: auto;
+}
+.input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+#letter-input {
+    width: 200px;
+    height: 40px;
+    font-size: 24px;
+    text-align: center;
+    text-transform: uppercase;
+    border: 2px solid var(--text-color);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-radius: 5px;
+}
+
+#letter-input::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
+}
+#submit-letter {
+    margin-top: 10px;
+    padding: 8px 20px;
+    font-size: 18px;
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#submit-letter:hover:not(:disabled) {
+    background-color: var(--purple-color);
+}
+
+#submit-letter:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.word-display {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.word-cell {
+    text-transform: uppercase;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 2px solid var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-color);
+    border-radius: 10px;
+}
+
+#game-info {
+    font-size: 24px;
+    text-align: center;
+    margin-top: 20px;
+    min-height: 60px;
+}
