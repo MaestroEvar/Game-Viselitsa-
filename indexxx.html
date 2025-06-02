@@ -7,11 +7,65 @@
 	<script src="scripts/theme.js" type="text/javascript"></script>
 </head>
 <body>
+	<div id="start-screen" class="start-screen">
+    <div class="start-container">
+        <h2>Выберите тему и сложность</h2>
+        <div class="theme-selector">
+            <label>Тема:
+                <select id="theme-select">
+                    <option value="животные">Животные</option>
+                    <option value="растения">Растения</option>
+                    <option value="города">Города</option>
+                    <option value="профессии">Профессии</option>
+                    <option value="страны">Страны</option>
+                    <option value="спорт">Спорт</option>
+                    <option value="техника">Техника</option>
+                    <option value="еда">Еда</option>
+                    <option value="искусство">Искусство</option>
+                    <option value="наука">Наука</option>
+                    <option value="транспорт">Транспорт</option>
+                    <option value="природа">Природа</option>
+                </select>
+            </label>
+        </div>
+        <div class="difficulty-selector">
+            <label>Сложность:
+                <select id="difficulty-select">
+                    <option value="легкие">Легкая</option>
+                    <option value="средние">Средняя</option>
+                    <option value="сложные">Сложная</option>
+                </select>
+            </label>
+        </div>
+        <div class="errors-selector">
+            <label>Количество ошибок:
+                <select id="errors-select">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9" selected>9</option>
+                </select>
+            </label>
+        </div>
+        <button id="start-game">Начать игру</button>
+    </div>
+</div>
 	<div class="container">
 		<div class="orange"><h1>Виселица</h1></div>
 		<div class="purple"></div>
-			<div class="blue"><h1>Информация о ходе игры</h1><p id="game-info"></p></div>
-			<div class="purple second-purple"></div>
+			<div class="blue">
+    <h1 id="game-info"></h1>
+    <div id="gallows-container" class="gallows-container"></div>
+</div>
+			<div class="purple second-purple">
+                <h1>Ошибки</h1>
+                <div id="errors-grid" class="errors-grid"></div>
+            </div>
 			<div class="pink">
 				<div class="theme-switcher">
 					<div class="theme-switch">
@@ -24,9 +78,10 @@
 				<div id="word-display" class="word-display"></div>
 				<div class="input-container">
 					<input type="text" id="letter-input" maxlength="1" placeholder="Введите букву">
-					<p id="error-message" style="color: red; display: none;">Пожалуйста, введите одну русскую букву!</p>
 					<button id="submit-letter" disabled>Отправить букву</button>
+					<p id="error-message" style="color: red; display: none;">Пожалуйста, введите одну русскую букву!</p>
 				</div>
+				<button id="restart-button" class="restart-button">Начать заново</button>
 			</div>
 	</div>
 </body>
