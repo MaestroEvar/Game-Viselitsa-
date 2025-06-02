@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Инициализация сетки ошибок
     function initErrorsGrid() {
         errorsGrid.innerHTML = '';
-        for (let i = 0; i < currentErrors; i++) {
+        for (let i = 0; i < maxErrors; i++) {
             const cell = document.createElement('div');
             cell.className = 'error-cell';
             cell.id = `error-${i}`;
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Обновление сетки ошибок
     function updateErrorsGrid() {
-        for (let i = 0; i < 9; i++) {
+        for (let i = 0; i < maxErrors; i++) {
             const cell = document.getElementById(`error-${i}`);
             if (i < currentErrors) {
                 cell.classList.add('filled');
@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     initGallowsImages();
-    initErrorsGrid();
 
     // Загрузка слов из JSON
     fetch('words.json')
@@ -103,7 +102,6 @@ document.addEventListener('DOMContentLoaded', function() {
         startScreen.style.display = 'flex';
         currentErrors = 0;
         updateErrorsGrid();
-        
         // Сбрасываем игровое поле
         wordDisplay.innerHTML = '';
         gameInfo.textContent = '';
@@ -129,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const theme = themeSelect.value;
         const difficulty = difficultySelect.value;
         maxErrors = parseInt(errorsSelect.value);
-        
+        initErrorsGrid();
         if (wordsData[theme] && wordsData[theme][difficulty]) {
             const wordsList = wordsData[theme][difficulty];
             secretWord = wordsList[Math.floor(Math.random() * wordsList.length)].toLowerCase();
