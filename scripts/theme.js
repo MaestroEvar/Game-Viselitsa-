@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Переключение темы
     const themeToggle = document.getElementById('theme-toggle');
     const savedTheme = localStorage.getItem('theme');
@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.setAttribute('data-theme', 'dark');
         themeToggle.checked = true;
     }
-    themeToggle.addEventListener('change', function() {
+    // Обработчик переключения темы
+    themeToggle.addEventListener('change', function () {
         if (this.checked) {
             document.body.setAttribute('data-theme', 'dark');
             localStorage.setItem('theme', 'dark');
@@ -14,8 +15,12 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.removeAttribute('data-theme');
             localStorage.removeItem('theme');
         }
+
+        if (currentTheme) {
+            setThemeBackground();
+        }
     });
-    
+
     // Элементы интерфейса
     const startScreen = document.getElementById('start-screen');
     const themeSelect = document.getElementById('theme-select');
@@ -23,15 +28,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorsSelect = document.getElementById('errors-select');
     const startButton = document.getElementById('start-game');
     const letterInput = document.getElementById('letter-input');
-    const gameInfo = document.getElementById('game-info');
-    const errorMessage = document.getElementById('error-message');
+    const themeDisplay = document.getElementById('theme-display');
+    const messageContainer = document.getElementById('message-container');
     const submitButton = document.getElementById('submit-letter');
-    const usedDisplay = document.querySelector('.purple');
     const wordDisplay = document.getElementById('word-display');
     const gallowsContainer = document.getElementById('gallows-container');
     const restartButton = document.getElementById('restart-button');
     const errorsGrid = document.getElementById('errors-grid');
-    
+    const keyboardContainer = document.getElementById('keyboard-container');
+
     // Игровые переменные
     let secretWord = "";
     let maxErrors = 9;
@@ -41,6 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let gameOver = false;
     let wordsData = {};
     let gallowsImages = [];
+    let currentTheme = "";
+    let keyboardButtons = {};
+    setThemeBackground();
 
     // Инициализация изображений виселицы
     function initGallowsImages() {
@@ -54,7 +62,89 @@ document.addEventListener('DOMContentLoaded', function() {
             gallowsImages.push(img);
         }
     }
-    
+
+    // Создание виртуальной клавиатуры
+    function createKeyboard() {
+        keyboardContainer.innerHTML = '';
+        keyboardButtons = {};
+
+        const russianLetters = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+
+        for (let letter of russianLetters) {
+            const button = document.createElement('button');
+            button.className = 'keyboard-button';
+            button.textContent = letter.toUpperCase();
+            button.dataset.letter = letter;
+            button.addEventListener('click', () => {
+                if (gameOver || button.disabled) return;
+                handleKeyboardInput(letter);
+            });
+            keyboardContainer.appendChild(button);
+            keyboardButtons[letter] = button;
+        }
+    }
+
+    // Обработка ввода с клавиатуры
+    function handleKeyboardInput(letter) {
+        if (gameOver) return;
+
+        letterInput.value = letter;
+        const event = new Event('input', { bubbles: true });
+        letterInput.dispatchEvent(event);
+
+        if (!submitButton.disabled) {
+            submitButton.click();
+        }
+    }
+
+    // Обновление состояния кнопок клавиатуры
+    function updateKeyboard() {
+        for (const letter in keyboardButtons) {
+            const button = keyboardButtons[letter];
+            if (usedLetters.includes(letter)) {
+                button.disabled = true;
+                if (secretWord.includes(letter)) {
+                    button.classList.add('correct');
+                } else {
+                    button.classList.add('incorrect');
+                }
+            } else {
+                button.disabled = false;
+                button.classList.remove('correct', 'incorrect');
+            }
+        }
+    }
+
+    // Установка фонового изображения для темы
+    function setThemeBackground() {
+        const isDarkTheme = document.body.getAttribute('data-theme') === 'dark';
+        const themeSuffix = isDarkTheme ? '2' : '1';
+        const imageUrl = `images/${currentTheme}${themeSuffix}.jpg`;
+
+        const blueContainer = document.querySelector('.blue');
+        blueContainer.style.backgroundImage = `url('${imageUrl}')`;
+        const orangeContainer = document.querySelector('.orange');
+        const orangeImage = `images/titl${themeSuffix}.jpg`;
+        orangeContainer.style.backgroundImage = `url('${orangeImage}')`;
+
+        const purpleContainers = document.querySelectorAll('.purple');
+        const purpleTexture = `images/colum${themeSuffix}.jpg`;
+        purpleContainers.forEach(container => {
+            container.style.backgroundImage = `url('${purpleTexture}')`;
+        });
+
+        const pinkContainer = document.querySelector('.pink');
+        const pinkTexture = `images/str${themeSuffix}.jpg`;
+        pinkContainer.style.backgroundImage = `url('${pinkTexture}')`;
+    }
+
+    // Показ сообщений
+    function showMessage(message, isError = false) {
+        messageContainer.textContent = message;
+        messageContainer.style.backgroundColor = isError ? 'rgba(255, 0, 0, 0.3)' : 'rgba(0, 255, 0, 0.3)';
+        messageContainer.style.display = 'block';
+    }
+
     // Инициализация сетки ошибок
     function initErrorsGrid() {
         errorsGrid.innerHTML = '';
@@ -65,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
             errorsGrid.appendChild(cell);
         }
     }
-    
+
     // Обновление сетки ошибок
     function updateErrorsGrid() {
         for (let i = 0; i < maxErrors; i++) {
@@ -77,11 +167,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-    
+
     initGallowsImages();
+    createKeyboard();
 
     // Загрузка слов из JSON
-    fetch('words.json')
+    fetch('data/words.json')
         .then(response => response.json())
         .then(data => {
             wordsData = data.words;
@@ -96,38 +187,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
         });
-    
+
     // Рестарт игры
-    restartButton.addEventListener('click', function() {
+    restartButton.addEventListener('click', function () {
         startScreen.style.display = 'flex';
         currentErrors = 0;
         updateErrorsGrid();
-        // Сбрасываем игровое поле
         wordDisplay.innerHTML = '';
-        gameInfo.textContent = '';
-        usedDisplay.textContent = '';
+        themeDisplay.textContent = '';
         letterInput.value = '';
         letterInput.disabled = false;
         letterInput.style.backgroundColor = '';
         letterInput.placeholder = 'Введите букву';
         submitButton.disabled = true;
-        
-        // Убираем красные/зеленые подсветки ячеек
+        messageContainer.style.display = 'none';
+
         const cells = document.querySelectorAll('.word-cell');
         cells.forEach(cell => {
             cell.style.backgroundColor = '';
         });
-        
-        // Скрываем все изображения виселицы
+
         gallowsImages.forEach(img => img.style.display = 'none');
+
+        // Сброс клавиатуры
+        usedLetters = [];
+        updateKeyboard();
     });
-    
+
     // Начало игры
-    startButton.addEventListener('click', function() {
+    startButton.addEventListener('click', function () {
         const theme = themeSelect.value;
         const difficulty = difficultySelect.value;
         maxErrors = parseInt(errorsSelect.value);
+        currentTheme = theme;
         initErrorsGrid();
+
         if (wordsData[theme] && wordsData[theme][difficulty]) {
             const wordsList = wordsData[theme][difficulty];
             secretWord = wordsList[Math.floor(Math.random() * wordsList.length)].toLowerCase();
@@ -136,9 +230,11 @@ document.addEventListener('DOMContentLoaded', function() {
             gameOver = false;
             currentErrors = 0;
             startScreen.style.display = 'none';
+            themeDisplay.textContent = `Тема: ${theme}`;
+            showMessage(`Игра началась! У вас ${maxErrors} попыток.`, false);
             initGame();
         } else {
-            alert('Ошибка: не удалось загрузить слова. Попробуйте еще раз.');
+            showMessage('Ошибка: не удалось загрузить слова. Попробуйте еще раз.', true);
         }
     });
 
@@ -149,39 +245,32 @@ document.addEventListener('DOMContentLoaded', function() {
             const cell = document.createElement('div');
             cell.className = 'word-cell';
             cell.id = `letter-${i}`;
-            
+
             if (secretWord[i] === ' ') {
-                cell.textContent = ' ';
-                cell.style.backgroundColor = 'transparent';
-                cell.style.border = 'none';
-                guessedLetters[i] = ' '; 
+                guessedLetters[i] = ' ';
             } else {
                 cell.textContent = guessedLetters[i] === '_' ? '' : guessedLetters[i];
             }
-            
+
             wordDisplay.appendChild(cell);
         }
     }
-    
-    // Обновление информации о игре
-    function updateGameInfo(message) {
-        gameInfo.textContent = message;
-        usedDisplay.textContent = `Использованные буквы: ${usedLetters.join(', ')}`;
-    }
-    
+
     // Инициализация игры
     function initGame() {
         createWordDisplay();
-        updateGameInfo(`Введите букву, чтобы начать игру! Осталось ошибок: ${maxErrors - currentErrors}`);
         letterInput.disabled = false;
         submitButton.disabled = true;
         letterInput.value = '';
         letterInput.style.backgroundColor = '';
         letterInput.placeholder = 'Введите букву';
         updateGallowsImage();
-        updateErrorsGrid();
+        setThemeBackground();
+
+        // Сброс клавиатуры
+        updateKeyboard();
     }
-    
+
     // Обновление изображения виселицы
     function updateGallowsImage() {
         gallowsImages.forEach(img => img.style.display = 'none');
@@ -191,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (currentImage) currentImage.style.display = 'block';
         }
     }
-    
+
     // Проверка, угадано ли слово
     function isWordGuessed() {
         for (let i = 0; i < secretWord.length; i++) {
@@ -203,36 +292,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Обработка ввода буквы
-    letterInput.addEventListener('input', function() {
+    letterInput.addEventListener('input', function () {
         if (gameOver) return;
-        
+
         const userLetter = this.value.toLowerCase();
         const isValid = /^[а-яА-ЯёЁ]?$/.test(userLetter);
-        
+
         if (!isValid) {
-            errorMessage.textContent = "Пожалуйста, введите одну русскую букву!";
-            errorMessage.style.display = 'block';
+            showMessage("Пожалуйста, введите одну русскую букву!", true);
             this.value = '';
             submitButton.disabled = true;
             return;
         }
-        
+
         if (userLetter && usedLetters.includes(userLetter)) {
-            errorMessage.textContent = "Эта буква была введена ранее!";
-            errorMessage.style.display = 'block';
+            showMessage("Эта буква уже использовалась!", true);
             submitButton.disabled = true;
             return;
         }
-        
-        errorMessage.style.display = 'none';
+
+        messageContainer.style.display = 'none';
         submitButton.disabled = this.value.length === 0;
     });
 
     // Отправка буквы
-    submitButton.addEventListener('click', function() {
+    submitButton.addEventListener('click', function () {
         const userLetter = letterInput.value.toLowerCase();
         let letterFound = false;
-        
+
         for (let i = 0; i < secretWord.length; i++) {
             if (secretWord[i] === userLetter) {
                 guessedLetters[i] = userLetter;
@@ -241,15 +328,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 letterFound = true;
             }
         }
-        
+
         usedLetters.push(userLetter);
         usedLetters.sort();
-        
+
+        // Обновление клавиатуры
+        updateKeyboard();
+
         if (letterFound) {
-            updateGameInfo(`Правильно! Буква "${userLetter.toUpperCase()}" есть в слове!`);
-            
+            showMessage(`Правильно! Буква "${userLetter.toUpperCase()}" есть в слове!`, false);
+
             if (isWordGuessed()) {
-                updateGameInfo(`Поздравляем! Вы угадали слово: ${secretWord.toUpperCase()}`);
+                showMessage(`Поздравляем! Вы угадали слово: ${secretWord.toUpperCase()}`, false);
                 endGame(true);
                 for (let i = 0; i < secretWord.length; i++) {
                     if (secretWord[i] !== ' ') {
@@ -262,13 +352,13 @@ document.addEventListener('DOMContentLoaded', function() {
             updateErrorsGrid();
             updateGallowsImage();
             const remaining = maxErrors - currentErrors;
-            updateGameInfo(`Ошибка! Буквы "${userLetter.toUpperCase()}" нет в слове. Осталось ошибок: ${remaining}`);
+            showMessage(`Ошибка! Буквы "${userLetter.toUpperCase()}" нет в слове. Осталось попыток: ${remaining}`, true);
         }
         letterInput.value = '';
         submitButton.disabled = true;
-        
+
         if (currentErrors >= maxErrors) {
-            updateGameInfo(`Вы проиграли! Загаданное слово: ${secretWord.toUpperCase()}`);
+            showMessage(`Вы проиграли! Загаданное слово: ${secretWord.toUpperCase()}`, true);
             endGame(false);
         }
     });
@@ -285,7 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.disabled = true;
         letterInput.style.backgroundColor = isWin ? 'rgb(133, 226, 82)' : 'rgb(230, 12, 12)';
         letterInput.placeholder = isWin ? 'Победа!' : 'Поражение!';
-        
+
         if (!isWin) {
             for (let i = 0; i < secretWord.length; i++) {
                 if (secretWord[i] !== ' ' && document.getElementById(`letter-${i}`).textContent.length === 0) {
@@ -296,9 +386,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Обработка нажатия Enter
-    letterInput.addEventListener('keydown', function(e) {
+    letterInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !submitButton.disabled) {
             submitButton.click();
         }
     });
+
 });
