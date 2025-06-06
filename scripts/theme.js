@@ -240,21 +240,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Создание отображения слова
     function createWordDisplay() {
-        wordDisplay.innerHTML = '';
-        for (let i = 0; i < secretWord.length; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'word-cell';
-            cell.id = `letter-${i}`;
-
-            if (secretWord[i] === ' ') {
-                guessedLetters[i] = ' ';
-            } else {
-                cell.textContent = guessedLetters[i] === '_' ? '' : guessedLetters[i];
-            }
-
-            wordDisplay.appendChild(cell);
+    wordDisplay.innerHTML = '';
+    for (let i = 0; i < secretWord.length; i++) {
+        // Если символ - пробел, создаем пустой контейнер без стилей ячейки
+        if (secretWord[i] === ' ') {
+            const space = document.createElement('div');
+            space.className = 'word-space';
+            space.style.width = '20px'; // Ширина пробела
+            wordDisplay.appendChild(space);
+            guessedLetters[i] = ' ';
+            continue;
         }
+
+        const cell = document.createElement('div');
+        cell.className = 'word-cell';
+        cell.id = `letter-${i}`;
+        cell.textContent = guessedLetters[i] === '_' ? '' : guessedLetters[i];
+        wordDisplay.appendChild(cell);
     }
+}
 
     // Инициализация игры
     function initGame() {
@@ -283,13 +287,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Проверка, угадано ли слово
     function isWordGuessed() {
-        for (let i = 0; i < secretWord.length; i++) {
-            if (secretWord[i] !== ' ' && guessedLetters[i] === '_') {
-                return false;
-            }
+    for (let i = 0; i < secretWord.length; i++) {
+        // Пропускаем пробелы
+        if (secretWord[i] === ' ') continue;
+        
+        if (guessedLetters[i] === '_') {
+            return false;
         }
-        return true;
     }
+    return true;
+}
 
     // Обработка ввода буквы
     letterInput.addEventListener('input', function () {
@@ -364,26 +371,30 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Завершение игры
-    function endGame(isWin) {
-        if (!isWin) {
-            gallowsImages.forEach(img => img.style.display = 'none');
-            const lastImage = document.getElementById('gallows-9');
-            if (lastImage) lastImage.style.display = 'block';
-        }
-        gameOver = true;
-        letterInput.disabled = true;
-        submitButton.disabled = true;
-        letterInput.style.backgroundColor = isWin ? 'rgb(133, 226, 82)' : 'rgb(230, 12, 12)';
-        letterInput.placeholder = isWin ? 'Победа!' : 'Поражение!';
+function endGame(isWin) {
+    if (!isWin) {
+        gallowsImages.forEach(img => img.style.display = 'none');
+        const lastImage = document.getElementById('gallows-9');
+        if (lastImage) lastImage.style.display = 'block';
+    }
+    gameOver = true;
+    letterInput.disabled = true;
+    submitButton.disabled = true;
+    letterInput.style.backgroundColor = isWin ? 'rgb(133, 226, 82)' : 'rgb(230, 12, 12)';
+    letterInput.placeholder = isWin ? 'Победа!' : 'Поражение!';
 
-        if (!isWin) {
-            for (let i = 0; i < secretWord.length; i++) {
-                if (secretWord[i] !== ' ' && document.getElementById(`letter-${i}`).textContent.length === 0) {
-                    document.getElementById(`letter-${i}`).style.backgroundColor = 'rgb(255, 0, 0)';
-                }
+    if (!isWin) {
+        for (let i = 0; i < secretWord.length; i++) {
+            // Пропускаем пробелы
+            if (secretWord[i] === ' ') continue;
+            
+            const cell = document.getElementById(`letter-${i}`);
+            if (cell && cell.textContent.length === 0) {
+                cell.style.backgroundColor = 'rgb(255, 0, 0)';
             }
         }
     }
+}
 
     // Обработка нажатия Enter
     letterInput.addEventListener('keydown', function (e) {
