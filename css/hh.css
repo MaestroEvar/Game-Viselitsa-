@@ -159,8 +159,8 @@ body {
 
 @media(max-width: 599.99px) {
     .keyboard-button {
-        font-size: 50px;
-        min-height: 50px;
+        font-size: 30px;
+        min-height: 45зx;
     }
 
     .container {
@@ -568,7 +568,6 @@ select {
 @media(max-width: 1299.99px) {
     .keyboard-button {
         padding: 5px;
-        font-size: 14px;
         grid-template-columns: repeat(10, 1fr);
     }
 }
